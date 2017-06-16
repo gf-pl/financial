@@ -4,6 +4,11 @@ namespace Financial;
 
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Money\Converter;
+use Money\Currencies\ISOCurrencies;
+use Money\Currency;
+use Money\Exchange\SwapExchange;
+use Swap\Builder;
 
 class PaymentList
 {
@@ -37,5 +42,27 @@ class PaymentList
     public function getCurrencies(): ArrayCollection
     {
         return $this->currencies;
+    }
+
+    public function recalculateToGivenCurrency(Currency $currency) :PaymentList
+    {
+        $swap = (new Builder())
+            ->add('fixer')
+            ->add('yahoo')
+            ->build();
+        $exchange = new SwapExchange($swap);
+        $converter = new Converter(new ISOCurrencies(), $exchange);
+
+        $listWithOneCurrency = new PaymentList();
+
+        foreach ($this->getList()->getValues() as &$value) {
+            /** @var Payment $value */
+            $newValue = $converter->convert($value->getValue(), $currency);
+            $date = $value->getDate();
+            $listWithOneCurrency->addPayment(new Payment($newValue, $date));
+        }
+
+        return $listWithOneCurrency;
+
     }
 }
