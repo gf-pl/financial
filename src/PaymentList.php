@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 class PaymentList
 {
+    /** @var ArrayCollection */
     private $list;
 
     public function __construct()

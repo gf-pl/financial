@@ -7,7 +7,9 @@ use Money\Money;
 
 class Payment
 {
+    /** @var Money */
     private $value;
+    /** @var \DateTime */
     private $date;
 
     public function __construct(Money $value, \DateTime $date)

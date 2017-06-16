@@ -5,7 +5,9 @@ namespace Financial;
 
 final class DateDiff
 {
+    /** @var \DateTime */
     private $startDate;
+    /** @var \DateTime */
     private $endDate;
 
     public function __construct(\DateTime $startDate, \DateTime $endDate)
