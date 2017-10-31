@@ -47,4 +47,16 @@ final class FinancialTest extends TestCase
         $this->assertFinite($financial->XIRR($paymentList));
         $this->assertEquals(0, round($financial->XIRR($paymentList), 4));
     }
+
+    public function test_irr()
+    {
+        $paymentList = new PaymentList();
+        $paymentList->addPayment(new Payment(Money::EUR(100), new \DateTime('2016-01-01')));
+        $paymentList->addPayment(new Payment(Money::EUR(-100), new \DateTime('2016-12-31')));
+        $paymentList = $paymentList->recalculateToGivenCurrency(new Currency('EUR'));
+
+        $financial = new Financial();
+        $this->assertFinite($financial->IRR($paymentList));
+        $this->assertEquals(0, round($financial->XIRR($paymentList), 4));
+    }
 }
