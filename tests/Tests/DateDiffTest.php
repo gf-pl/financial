@@ -2,8 +2,7 @@
 
 namespace Tests\Financial;
 
-
-use Financial\DateDiff;
+use Financial\Tools\DateDiff;
 use PHPUnit\Framework\TestCase;
 
 final class DateDiffTest extends TestCase
@@ -11,7 +10,7 @@ final class DateDiffTest extends TestCase
     private $endDate;
     private $startDate;
 
-    function __construct($name = null, array $data = [], $dataName = '')
+    public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
 
@@ -19,7 +18,7 @@ final class DateDiffTest extends TestCase
         $this->endDate = new \DateTime('2017-02-10');
     }
 
-    function test_date_diff_differences()
+    public function test_date_diff_differences()
     {
 
         $dateDiff = new DateDiff($this->startDate, $this->endDate);

@@ -3,35 +3,41 @@ declare(strict_types = 1);
 
 namespace Financial;
 
+use Financial\Tools\xnpv;
 
 final class Financial
 {
     const MAX_ITERATIONS = 100;
     const ACCURACY = 1.0e-6;
 
+    /**
+     * @param SingleCurrencyPaymentList $paymentList
+     * @param float $guess
+     *
+     * @return float|null
+     */
     public function XIRR(SingleCurrencyPaymentList $paymentList, $guess = 0.1)
     {
-        // create an initial bracket, with a root somewhere between bot and top
         $x1 = 0.0;
         $x2 = $guess;
-        $f1 = Tools::XNPV($x1, $paymentList);
-        $f2 = Tools::XNPV($x2, $paymentList);
+        $f1 = xnpv::calculate($x1, $paymentList);
+        $f2 = xnpv::calculate($x2, $paymentList);
         for ($i = 0; $i < self::MAX_ITERATIONS; $i++)
         {
             if (($f1 * $f2) < 0.0) {
                 break;
             }
             if (abs($f1) < abs($f2)) {
-                $f1 = Tools::XNPV($x1 += 1.6 * ($x1 - $x2), $paymentList);
+                $f1 = xnpv::calculate($x1 += 1.6 * ($x1 - $x2), $paymentList);
             } else {
-                $f2 = Tools::XNPV($x2 += 1.6 * ($x2 - $x1), $paymentList);
+                $f2 = xnpv::calculate($x2 += 1.6 * ($x2 - $x1), $paymentList);
             }
         }
         if (($f1 * $f2) > 0.0) {
             return null;
         }
 
-        $f = Tools::XNPV($x1, $paymentList);
+        $f = xnpv::calculate($x1, $paymentList);
         if ($f < 0.0) {
             $rtb = $x1;
             $dx = $x2 - $x1;
@@ -44,7 +50,7 @@ final class Financial
         {
             $dx *= 0.5;
             $x_mid = $rtb + $dx;
-            $f_mid = Tools::XNPV($x_mid, $paymentList);
+            $f_mid = xnpv::calculate($x_mid, $paymentList);
             if ($f_mid <= 0.0) {
                 $rtb = $x_mid;
             }
