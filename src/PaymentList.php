@@ -46,6 +46,12 @@ class PaymentList
 
     public function recalculateToGivenCurrency(Currency $currency) :SingleCurrencyPaymentList
     {
+        $conversionNeeded = true;
+        if ($this->getCurrencies()->count() === 1 && $currency->getCode() === $this->getCurrencies()->first())
+        {
+            $conversionNeeded = false;
+        }
+
         $swap = (new Builder())
             ->add('fixer')
             ->add('yahoo')
@@ -57,9 +63,11 @@ class PaymentList
 
         foreach ($this->getList()->getValues() as &$value) {
             /** @var Payment $value */
-            $newValue = $converter->convert($value->getValue(), $currency);
-            $date = $value->getDate();
-            $listWithOneCurrency->addPayment(new Payment($newValue, $date));
+            $newValue = $value->getValue();
+            if(true === $conversionNeeded) {
+                $newValue = $converter->convert($value->getValue(), $currency);
+            }
+            $listWithOneCurrency->addPayment(new Payment($newValue, $value->getDate()));
         }
 
         return $listWithOneCurrency;
