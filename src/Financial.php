@@ -5,6 +5,7 @@ namespace Financial;
 
 use Financial\Tools\npv;
 use Financial\Tools\xnpv;
+use Money\Money;
 
 final class Financial
 {
@@ -124,5 +125,31 @@ final class Financial
                 return $x_mid;
             }
         }
+    }
+
+    /**
+     * SYD
+     * Returns the sum-of-years' digits depreciation of an asset for
+     * a specified period.
+     * https://support.office.com/pl-pl/article/SYD-funkcja-069f8106-b60b-4ca2-98e0-2a0f206bdb27.
+     *
+     * @param Money $cost is the initial cost of the asset
+     * @param Money $salvage is the value at the end of the depreciation (sometimes called the salvage value of the asset)
+     * @param int $life is the number of periods over which the asset is depreciated (sometimes called the useful life of the asset)
+     * @param int $period is the period and must use the same units as life
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return Money|null
+     */
+    public function SYD(Money $cost, Money $salvage, int $life, int $period)
+    {
+        if ($cost->getCurrency()->getCode() !== $salvage->getCurrency()->getCode()) {
+            throw new \InvalidArgumentException('');
+        }
+        $sydValue = (($cost->getAmount() - $salvage->getAmount()) * ($life - $period + 1) * 2) / ($life * (1 + $life));
+        $sydValue = \round($sydValue);
+
+        return \is_finite($sydValue) ? new Money($sydValue, $cost->getCurrency()) : null;
     }
 }
