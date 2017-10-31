@@ -59,4 +59,11 @@ final class FinancialTest extends TestCase
         $this->assertFinite($financial->IRR($paymentList));
         $this->assertEquals(0, round($financial->XIRR($paymentList), 4));
     }
+
+    public function test_syd()
+    {
+        $financial = new Financial();
+        $this->assertEquals(Money::EUR(4090.91 * 100), $financial->SYD(Money::EUR(30000 * 100), Money::EUR(7500 * 100), 10, 1), 2);
+        $this->assertEquals(Money::EUR(409.09 * 100), $financial->SYD(Money::EUR(30000 * 100), Money::EUR(7500 * 100), 10, 10), 2);
+    }
 }
