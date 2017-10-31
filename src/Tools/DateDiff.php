@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Financial\Tools;
 
@@ -18,18 +18,18 @@ final class DateDiff
 
     public function days(): int
     {
-        return (int) ceil($this->endDate->diff($this->startDate)->days);
+        return (int) \ceil($this->endDate->diff($this->startDate)->days);
     }
 
     public function weeks(): int
     {
-        return (int) ceil($this->endDate->diff($this->startDate)->days / 7);
+        return (int) \ceil($this->endDate->diff($this->startDate)->days / 7);
     }
 
     public function months(): int
     {
-        return ((int)$this->endDate->format('Y') - (int)$this->startDate->format('Y')) * 12
-            + ((int)$this->endDate->format('m') - (int)$this->startDate->format('m'));
+        return ((int) $this->endDate->format('Y') - (int) $this->startDate->format('Y')) * 12
+            + ((int) $this->endDate->format('m') - (int) $this->startDate->format('m'));
     }
 
     public function years(): int
@@ -37,4 +37,3 @@ final class DateDiff
         return $this->endDate->diff($this->startDate)->y;
     }
 }
-

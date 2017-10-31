@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Financial\Tools;
 
@@ -20,11 +20,10 @@ final class xnpv
         $xnpv = 0.0;
 
         foreach ($paymentList->getList() as $payment) {
-            /** @var Payment $payment */
+            /* @var Payment $payment */
             $xnpv += $payment->getValue()->getAmount() / ((1 + $rate) ** ((new DateDiff($paymentList->getList()->first()->getDate(), $payment->getDate()))->days() / 365));
         }
 
-        return (is_finite($xnpv) ? $xnpv: null);
+        return \is_finite($xnpv) ? $xnpv : null;
     }
 }
-

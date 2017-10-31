@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Financial\Tools;
 
@@ -21,10 +21,10 @@ final class npv
         $i = 0;
 
         foreach ($paymentList->getList() as $payment) {
-            /** @var Payment $payment */
+            /* @var Payment $payment */
             $npv += $payment->getValue()->getAmount() / ((1 + $rate) ** ($i + 1));
         }
 
-        return (is_finite($npv) ? $npv: null);
+        return \is_finite($npv) ? $npv : null;
     }
 }

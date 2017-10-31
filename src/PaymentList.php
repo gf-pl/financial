@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Financial;
 
@@ -19,18 +19,19 @@ class PaymentList
 
     public function __construct()
     {
-        $this->list = new ArrayCollection;
-        $this->currencies = new ArrayCollection;
+        $this->list = new ArrayCollection();
+        $this->currencies = new ArrayCollection();
     }
 
-    public function addPayment(Payment $payment) :PaymentList
+    public function addPayment(Payment $payment): PaymentList
     {
         $this->list->add($payment);
 
         $currency = $payment->getValue()->getCurrency()->getCode();
-        if(!$this->currencies->contains($currency)) {
+        if (!$this->currencies->contains($currency)) {
             $this->currencies->add($currency);
         }
+
         return $this;
     }
 
@@ -44,11 +45,10 @@ class PaymentList
         return $this->currencies;
     }
 
-    public function recalculateToGivenCurrency(Currency $currency) :SingleCurrencyPaymentList
+    public function recalculateToGivenCurrency(Currency $currency): SingleCurrencyPaymentList
     {
         $conversionNeeded = true;
-        if ($this->getCurrencies()->count() === 1 && $currency->getCode() === $this->getCurrencies()->first())
-        {
+        if (1 === $this->getCurrencies()->count() && $currency->getCode() === $this->getCurrencies()->first()) {
             $conversionNeeded = false;
         }
 
@@ -64,13 +64,12 @@ class PaymentList
         foreach ($this->getList()->getValues() as &$value) {
             /** @var Payment $value */
             $newValue = $value->getValue();
-            if(true === $conversionNeeded) {
+            if (true === $conversionNeeded) {
                 $newValue = $converter->convert($value->getValue(), $currency);
             }
             $listWithOneCurrency->addPayment(new Payment($newValue, $value->getDate()));
         }
 
         return $listWithOneCurrency;
-
     }
 }
