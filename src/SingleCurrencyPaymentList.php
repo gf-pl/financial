@@ -5,6 +5,11 @@ namespace Financial;
 
 class SingleCurrencyPaymentList extends PaymentList
 {
-    //TODO: this class should not be extended from PaymentList.
-    //TODO: savecheck for single currency needed
+    public function addPayment(Payment $payment) :PaymentList
+    {
+        if ($this->getCurrencies()->count() > 0 && $payment->getValue()->getCurrency()->getCode() !== $this->getCurrencies()->first()) {
+            throw new \InvalidArgumentException('This list can contain only payments in ' . $this->getCurrencies()->first() . 'currency');
+        }
+        return parent::addPayment($payment);
+    }
 }
