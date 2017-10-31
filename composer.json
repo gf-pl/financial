@@ -9,6 +9,8 @@
     "type": "library",
     "description": "",
     "license": "GNU",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": ">=7.0",
         "moneyphp/money": "^3.0",
