@@ -1,7 +1,7 @@
 <?php
+declare(strict_types = 1);
 
 namespace Financial;
-
 
 final class DateDiff
 {
@@ -18,12 +18,12 @@ final class DateDiff
 
     public function days(): int
     {
-        return ceil($this->endDate->diff($this->startDate)->days);
+        return (int) ceil($this->endDate->diff($this->startDate)->days);
     }
 
     public function weeks(): int
     {
-        return ceil(($this->endDate->diff($this->startDate)->days) / 7);
+        return (int) ceil($this->endDate->diff($this->startDate)->days / 7);
     }
 
     public function months(): int

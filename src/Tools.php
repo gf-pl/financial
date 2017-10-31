@@ -1,12 +1,19 @@
 <?php
+declare(strict_types = 1);
 
 namespace Financial;
 
-
 final class Tools
 {
+    /**
+     * @param $rate
+     * @param SingleCurrencyPaymentList $paymentList
+     *
+     * @return float|null
+     */
     public static function XNPV($rate, SingleCurrencyPaymentList $paymentList)
     {
+        /** @var float $xnpv */
         $xnpv = 0.0;
 
         foreach ($paymentList->getList() as $payment) {

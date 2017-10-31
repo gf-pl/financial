@@ -1,7 +1,7 @@
 <?php
+declare(strict_types = 1);
 
 namespace Financial;
-
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Money\Converter;
