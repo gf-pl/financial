@@ -1,0 +1,39 @@
+{
+    "name": "grzegorz/financial",
+    "authors": [
+        {
+            "name": "Grzegorz Firlej",
+            "email": "dev@grzegorzfirlej.pl"
+        }
+    ],
+    "type": "library",
+    "description": "",
+    "license": "GNU",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=7.0",
+        "moneyphp/money": "^3.0",
+        "doctrine/collections": "^v1.4.0",
+        "php-http/message": "^1.6",
+        "florianv/swap": "^3.1",
+        "beberlei/assert": "^2.7",
+        "lstrojny/functional-php": "^1.6",
+        "php-http/curl-client": "^1.7",
+        "guzzlehttp/psr7": "^1.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.2",
+        "phpstan/phpstan": "^0.7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Financial\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Financial\\": "tests/"
+        }
+    }
+}
