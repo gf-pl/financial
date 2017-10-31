@@ -94,14 +94,18 @@ final class Financial
         $f2 = npv::calculate($x2, $paymentList);
         for ($i = 0; $i < self::MAX_ITERATIONS; $i++)
         {
-            if (($f1 * $f2) < 0.0) break;
+            if (($f1 * $f2) < 0.0) {
+                break;
+            }
             if (abs($f1) < abs($f2)) {
                 $f1 = npv::calculate($x1 += 1.6 * ($x1 - $x2), $paymentList);
             } else {
                 $f2 = npv::calculate($x2 += 1.6 * ($x2 - $x1), $paymentList);
             }
         }
-        if (($f1 * $f2) > 0.0) return null;
+        if (($f1 * $f2) > 0.0) {
+            return null;
+        }
 
         $f = npv::calculate($x1, $paymentList);
         if ($f < 0.0) {
@@ -120,7 +124,7 @@ final class Financial
             if ($f_mid <= 0.0) {
                 $rtb = $x_mid;
             }
-            if ((abs($f_mid) < FINANCIAL_ACCURACY) || (abs($dx) < FINANCIAL_ACCURACY)) {
+            if ((abs($f_mid) < self::ACCURACY) || (abs($dx) < self::ACCURACY)) {
                 return $x_mid;
             }
         }
