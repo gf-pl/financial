@@ -8,7 +8,7 @@ final class Financial
     const MAX_ITERATIONS = 100;
     const ACCURACY = 1.0e-6;
 
-    public function XIRR(PaymentList $paymentList, $guess = 0.1)
+    public function XIRR(SingleCurrencyPaymentList $paymentList, $guess = 0.1)
     {
         // create an initial bracket, with a root somewhere between bot and top
         $x1 = 0.0;

@@ -5,7 +5,7 @@ namespace Financial;
 
 final class Tools
 {
-    public static function XNPV($rate, PaymentList $paymentList)
+    public static function XNPV($rate, SingleCurrencyPaymentList $paymentList)
     {
         $xnpv = 0.0;
 

@@ -44,7 +44,7 @@ class PaymentList
         return $this->currencies;
     }
 
-    public function recalculateToGivenCurrency(Currency $currency) :PaymentList
+    public function recalculateToGivenCurrency(Currency $currency) :SingleCurrencyPaymentList
     {
         $swap = (new Builder())
             ->add('fixer')
@@ -53,7 +53,7 @@ class PaymentList
         $exchange = new SwapExchange($swap);
         $converter = new Converter(new ISOCurrencies(), $exchange);
 
-        $listWithOneCurrency = new PaymentList();
+        $listWithOneCurrency = new SingleCurrencyPaymentList();
 
         foreach ($this->getList()->getValues() as &$value) {
             /** @var Payment $value */
