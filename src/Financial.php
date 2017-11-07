@@ -152,4 +152,42 @@ final class Financial
 
         return \is_finite($sydValue) ? new Money($sydValue, $cost->getCurrency()) : null;
     }
+
+    /**
+     * DDB
+     * Returns the depreciation of an asset for a specified period using
+     * the double-declining balance method or some other method you specify.
+     * https://support.office.com/pl-pl/article/DDB-funkcja-519a7a37-8772-4c96-85c0-ed2c209717a5
+     *
+     * @param Money $cost is the initial cost of the asset.
+     * @param Money $salvage is the value at the end of the depreciation (sometimes called the salvage value of the asset).
+     * @param integer $life is the number of periods over which the asset is being depreciated (sometimes called the useful life of the asset).
+     * @param integer $period is the period for which you want to calculate the depreciation. Period must use the same units as life.
+     * @param float $factor is the rate at which the balance declines. If factor is omitted, it is assumed to be 2 (the double-declining balance method).
+     *
+     * @return Money
+     * @throws \InvalidArgumentException
+     */
+    public function DDB(Money $cost, Money $salvage, int $life, int $period, $factor = 2.0)
+    {
+        if ($cost->getCurrency()->getCode() !== $salvage->getCurrency()->getCode()) {
+            throw new \InvalidArgumentException('');
+        }
+
+        $x = 0;
+        $n = 0;
+        $costValue = $cost->getAmount();
+        while ($period > $n) {
+            $x = $factor * $costValue / $life;
+            if (($costValue - $x) < $salvage->getAmount()) {
+                $x = $costValue - $salvage->getAmount();
+            }
+            if ($x < 0) {
+                $x = 0;
+            }
+            $costValue -= $x;
+            $n++;
+        }
+        return \is_finite($x) ? new Money(round($x), $cost->getCurrency()) : null;
+    }
 }

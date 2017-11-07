@@ -63,7 +63,17 @@ final class FinancialTest extends TestCase
     public function test_syd()
     {
         $financial = new Financial();
-        $this->assertEquals(Money::EUR(4090.91 * 100), $financial->SYD(Money::EUR(30000 * 100), Money::EUR(7500 * 100), 10, 1), 2);
-        $this->assertEquals(Money::EUR(409.09 * 100), $financial->SYD(Money::EUR(30000 * 100), Money::EUR(7500 * 100), 10, 10), 2);
+        $this->assertEquals(Money::EUR(4090.91 * 100), $financial->SYD(Money::EUR(30000 * 100), Money::EUR(7500 * 100), 10, 1));
+        $this->assertEquals(Money::EUR(409.09 * 100), $financial->SYD(Money::EUR(30000 * 100), Money::EUR(7500 * 100), 10, 10));
+    }
+
+    public function test_ddb()
+    {
+        $financial = new Financial();
+        $this->assertEquals(Money::EUR(1.32 * 100), $financial->DDB(Money::EUR(2400 * 100), Money::EUR(300 * 100), 10 * 365, 1));
+        $this->assertEquals(Money::EUR(40 * 100), $financial->DDB(Money::EUR(2400 * 100), Money::EUR(300 * 100), 10 * 12, 1));
+        $this->assertEquals(Money::EUR(480 * 100), $financial->DDB(Money::EUR(2400 * 100), Money::EUR(300 * 100), 10, 1));
+        $this->assertEquals(Money::EUR(306 * 100), $financial->DDB(Money::EUR(2400 * 100), Money::EUR(300 * 100), 10, 2, 1.5));
+        $this->assertEquals(Money::EUR(22.12 * 100), $financial->DDB(Money::EUR(2400 * 100), Money::EUR(300 * 100), 10, 10));
     }
 }
