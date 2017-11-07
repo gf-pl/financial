@@ -65,6 +65,9 @@ final class FinancialTest extends TestCase
         $financial = new Financial();
         $this->assertEquals(Money::EUR(4090.91 * 100), $financial->SYD(Money::EUR(30000 * 100), Money::EUR(7500 * 100), 10, 1));
         $this->assertEquals(Money::EUR(409.09 * 100), $financial->SYD(Money::EUR(30000 * 100), Money::EUR(7500 * 100), 10, 10));
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->assertEquals(Money::EUR(409.09 * 100), $financial->SYD(Money::USD(30000 * 100), Money::EUR(7500 * 100), 10, 10));
     }
 
     public function test_ddb()
@@ -75,5 +78,8 @@ final class FinancialTest extends TestCase
         $this->assertEquals(Money::EUR(480 * 100), $financial->DDB(Money::EUR(2400 * 100), Money::EUR(300 * 100), 10, 1));
         $this->assertEquals(Money::EUR(306 * 100), $financial->DDB(Money::EUR(2400 * 100), Money::EUR(300 * 100), 10, 2, 1.5));
         $this->assertEquals(Money::EUR(22.12 * 100), $financial->DDB(Money::EUR(2400 * 100), Money::EUR(300 * 100), 10, 10));
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->assertEquals(Money::EUR(22.12 * 100), $financial->DDB(Money::PLN(2400 * 100), Money::EUR(300 * 100), 10, 10));
     }
 }
