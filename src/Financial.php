@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Financial;
 
-use Assert\Assert;
 use Assert\Assertion;
 use Financial\Tools\npv;
 use Financial\Tools\xnpv;
@@ -82,7 +81,7 @@ final class Financial
      * annually. The internal rate of return is the interest rate
      * received for an investment consisting of payments (negative
      * values) and income (positive values) that occur at regular periods.
-     * https://support.office.com/pl-pl/article/IRR-funkcja-64925eaa-9988-495b-b290-3ad0c163c1bc
+     * https://support.office.com/pl-pl/article/IRR-funkcja-64925eaa-9988-495b-b290-3ad0c163c1bc.
      *
      * @param SingleCurrencyPaymentList $paymentList
      * @param float $guess
@@ -164,16 +163,17 @@ final class Financial
      * DDB
      * Returns the depreciation of an asset for a specified period using
      * the double-declining balance method or some other method you specify.
-     * https://support.office.com/pl-pl/article/DDB-funkcja-519a7a37-8772-4c96-85c0-ed2c209717a5
+     * https://support.office.com/pl-pl/article/DDB-funkcja-519a7a37-8772-4c96-85c0-ed2c209717a5.
      *
-     * @param Money $cost is the initial cost of the asset.
-     * @param Money $salvage is the value at the end of the depreciation (sometimes called the salvage value of the asset).
-     * @param integer $life is the number of periods over which the asset is being depreciated (sometimes called the useful life of the asset).
-     * @param integer $period is the period for which you want to calculate the depreciation. Period must use the same units as life.
-     * @param float $factor is the rate at which the balance declines. If factor is omitted, it is assumed to be 2 (the double-declining balance method).
+     * @param Money $cost is the initial cost of the asset
+     * @param Money $salvage is the value at the end of the depreciation (sometimes called the salvage value of the asset)
+     * @param int $life is the number of periods over which the asset is being depreciated (sometimes called the useful life of the asset)
+     * @param int $period is the period for which you want to calculate the depreciation. Period must use the same units as life.
+     * @param float $factor is the rate at which the balance declines. If factor is omitted, it is assumed to be 2 (the double-declining balance method)
+     *
+     * @throws \InvalidArgumentException
      *
      * @return Money|null
-     * @throws \InvalidArgumentException
      */
     public function DDB(Money $cost, Money $salvage, int $life, int $period, $factor = 2.0)
     {
@@ -191,22 +191,24 @@ final class Financial
                 $x = 0;
             }
             $costValue -= $x;
-            $n++;
+            ++$n;
         }
-        return \is_finite($x) ? new Money(round($x), $cost->getCurrency()) : null;
+
+        return \is_finite($x) ? new Money(\round($x), $cost->getCurrency()) : null;
     }
 
     /**
      * SLN
      * Returns the straight-line depreciation of an asset for one period.
-     * https://support.office.com/pl-pl/article/SLN-funkcja-cdb666e5-c1c6-40a7-806a-e695edc2f1c8
+     * https://support.office.com/pl-pl/article/SLN-funkcja-cdb666e5-c1c6-40a7-806a-e695edc2f1c8.
      *
-     * @param  Money $cost is the initial cost of the asset.
-     * @param  Money $salvage is the value at the end of the depreciation (sometimes called the salvage value of the asset).
-     * @param  integer $life is the number of periods over which the asset is being depreciated (sometimes called the useful life of the asset).
+     * @param Money $cost is the initial cost of the asset
+     * @param Money $salvage is the value at the end of the depreciation (sometimes called the salvage value of the asset)
+     * @param int $life is the number of periods over which the asset is being depreciated (sometimes called the useful life of the asset)
+     *
+     * @throws \InvalidArgumentException
      *
      * @return Money|null
-     * @throws \InvalidArgumentException
      */
     public function SLN(Money $cost, Money $salvage, int $life)
     {
@@ -214,7 +216,7 @@ final class Financial
 
         $sln = ($cost->getAmount() - $salvage->getAmount()) / $life;
 
-        return (is_finite($sln) ? new Money(round($sln), $cost->getCurrency()) : null);
+        return \is_finite($sln) ? new Money(\round($sln), $cost->getCurrency()) : null;
     }
 
     /**
@@ -222,16 +224,17 @@ final class Financial
      * Returns the depreciation of an asset for any period you specify,
      * including partial periods, using the double-declining balance method
      * or some other method you specify. VDB stands for variable declining balance.
-     * https://support.office.com/pl-pl/article/VDB-funkcja-dde4e207-f3fa-488d-91d2-66d55e861d73
+     * https://support.office.com/pl-pl/article/VDB-funkcja-dde4e207-f3fa-488d-91d2-66d55e861d73.
      *
-     * @param  Money   $cost         is the initial cost of the asset.
-     * @param  Money   $salvage      is the value at the end of the depreciation (sometimes called the salvage value of the asset).
-     * @param  integer $life         is the number of periods over which the asset is depreciated (sometimes called the useful life of the asset).
-     * @param  integer $start_period is the starting period for which you want to calculate the depreciation. Start_period must use the same units as life.
-     * @param  integer $end_period   is the ending period for which you want to calculate the depreciation. End_period must use the same units as life.
-     * @param  float   $factor       is the rate at which the balance declines. If factor is omitted, it is assumed to be 2 (the double-declining balance method). Change factor if you do not want to use the double-declining balance method.
-     * @param  bool    $no_switch    is a logical value specifying whether to switch to straight-line depreciation when depreciation is greater than the declining balance calculation.
-     * @return Money   the depreciation of an asset.
+     * @param Money $cost is the initial cost of the asset
+     * @param Money $salvage is the value at the end of the depreciation (sometimes called the salvage value of the asset)
+     * @param int $life is the number of periods over which the asset is depreciated (sometimes called the useful life of the asset)
+     * @param int $start_period is the starting period for which you want to calculate the depreciation. Start_period must use the same units as life.
+     * @param int $end_period is the ending period for which you want to calculate the depreciation. End_period must use the same units as life.
+     * @param float $factor is the rate at which the balance declines. If factor is omitted, it is assumed to be 2 (the double-declining balance method). Change factor if you do not want to use the double-declining balance method.
+     * @param bool $no_switch is a logical value specifying whether to switch to straight-line depreciation when depreciation is greater than the declining balance calculation
+     *
+     * @return Money the depreciation of an asset
      */
     public function VDB(Money $cost, Money $salvage, int $life, int $start_period, int $end_period, float $factor = 2.0, bool $no_switch = false)
     {
@@ -241,25 +244,23 @@ final class Financial
             || $end_period < $start_period
             || $end_period > $life
             || $cost->getAmount() < 0
-            || $salvage->getAmount() > $cost->getAmount())
-        {
+            || $salvage->getAmount() > $cost->getAmount()) {
             return null;
         }
 
         $fVdb = 0.0;
-        $fIntStart = floor($start_period);
-        $fIntEnd = ceil($end_period);
+        $fIntStart = \floor($start_period);
+        $fIntEnd = \ceil($end_period);
 
         if ($no_switch) {
             $nLoopStart = (int) $fIntStart;
             $nLoopEnd = (int) $fIntEnd;
 
-            for ($i = $nLoopStart + 1; $i <= $nLoopEnd; $i++) {
+            for ($i = $nLoopStart + 1; $i <= $nLoopEnd; ++$i) {
                 $fTerm = $this->_ScGetGDA((float) $cost->getAmount(), (float) $salvage->getAmount(), $life, $i, $factor);
                 if ($i === $nLoopStart + 1) {
-                    $fTerm *= (min($end_period, $fIntStart + 1.0) - $start_period);
-                }
-                elseif ($i === $nLoopEnd) {
+                    $fTerm *= (\min($end_period, $fIntStart + 1.0) - $start_period);
+                } elseif ($i === $nLoopEnd) {
                     $fTerm *= ($end_period + 1.0 - $fIntEnd);
                 }
                 $fVdb += $fTerm;
@@ -296,7 +297,7 @@ final class Financial
         if ($fZins >= 1.0) {
             $fZins = 1.0;
             $fAlterWert = 0.0;
-            if ($fPeriode === 1.0) {
+            if (1.0 === $fPeriode) {
                 $fAlterWert = $fWert;
             }
         } else {
@@ -307,8 +308,7 @@ final class Financial
 
         if ($fNeuerWert < $fRest) {
             $fGda = $fAlterWert - $fRest;
-        }
-        else {
+        } else {
             $fGda = $fAlterWert - $fNeuerWert;
         }
 
@@ -323,14 +323,14 @@ final class Financial
     {
         $this->verifyCurrencyEquality($cost, $salvage);
 
-        $fVdb       = 0;
-        $fIntEnd    = ceil($period);
-        $nLoopEnd   = $fIntEnd;
-        $fRestwert  = $cost->getAmount() - $salvage->getAmount();
-        $bNowLia    = false;
+        $fVdb = 0;
+        $fIntEnd = \ceil($period);
+        $nLoopEnd = $fIntEnd;
+        $fRestwert = $cost->getAmount() - $salvage->getAmount();
+        $bNowLia = false;
 
         $fLia = 0;
-        for ($i = 1; $i <= $nLoopEnd; $i++) {
+        for ($i = 1; $i <= $nLoopEnd; ++$i) {
             if (!$bNowLia) {
                 $fGda = $this->_ScGetGDA(
                     (float) $cost->getAmount(),
@@ -339,13 +339,13 @@ final class Financial
                     $i,
                     $factor
                 );
-                $fLia = $fRestwert / ($life1 - (float)($i - 1));
+                $fLia = $fRestwert / ($life1 - (float) ($i - 1));
 
                 if ($fLia > $fGda) {
-                    $fTerm   = $fLia;
+                    $fTerm = $fLia;
                     $bNowLia = true;
                 } else {
-                    $fTerm      = $fGda;
+                    $fTerm = $fGda;
                     $fRestwert -= $fGda;
                 }
             } else {
@@ -357,6 +357,7 @@ final class Financial
             }
             $fVdb += $fTerm;
         }
-        return new Money(round($fVdb), $cost->getCurrency());
+
+        return new Money(\round($fVdb), $cost->getCurrency());
     }
 }
