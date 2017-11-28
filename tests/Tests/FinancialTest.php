@@ -91,4 +91,18 @@ final class FinancialTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->assertEquals(Money::EUR(2250 * 100), $financial->SLN(Money::PLN(30000 * 100), Money::EUR(7500 * 100), 10));
     }
+
+    public function test_vdb()
+    {
+        $financial = new Financial();
+        $this->assertEquals(Money::EUR(1.32 * 100), $financial->VDB(Money::EUR(2400 * 100), Money::EUR(300 * 100), 10 * 365, 0, 1));
+        $this->assertEquals(Money::EUR(40 * 100), $financial->VDB(Money::EUR(2400 * 100), Money::EUR(300 * 100), 10 * 12, 0, 1));
+        $this->assertEquals(Money::EUR(480 * 100), $financial->VDB(Money::EUR(2400 * 100), Money::EUR(300 * 100), 10, 0, 1));
+        $this->assertEquals(Money::EUR(396.31 * 100), $financial->VDB(Money::EUR(2400 * 100), Money::EUR(300 * 100), 10 * 12, 6, 18, 1));
+        $this->assertEquals(Money::EUR(311.81 * 100), $financial->VDB(Money::EUR(2400 * 100), Money::EUR(300 * 100), 10 * 12, 6, 18, 1.5));
+        $this->assertEquals(Money::EUR(315 * 100), $financial->VDB(Money::EUR(2400 * 100), Money::EUR(300 * 100), 10, 0, 0.875, 1.5));
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->assertEquals(Money::EUR(1.32 * 100), $financial->VDB(Money::EUR(2400 * 100), Money::PLN(300 * 100), 10 * 365, 0, 1));
+    }
 }

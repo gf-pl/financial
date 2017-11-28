@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Financial;
 
+use Assert\Assert;
+use Assert\Assertion;
 use Financial\Tools\npv;
 use Financial\Tools\xnpv;
 use Money\Money;
@@ -20,13 +22,14 @@ final class Financial
      *
      * Adapted from routine in Numerical Recipes in C, and translated
      * from the Bernt A Oedegaard algorithm in C
+     * https://support.office.com/pl-pl/article/XIRR-funkcja-de1242ec-6477-445b-b11b-a303ad9adc9d
      *
      * @param SingleCurrencyPaymentList $paymentList
      * @param float $guess
      *
      * @return float|null
      */
-    public function XIRR(SingleCurrencyPaymentList $paymentList, $guess = 0.1)
+    public function XIRR(SingleCurrencyPaymentList $paymentList, float $guess = 0.1)
     {
         $x1 = 0.0;
         $x2 = $guess;
@@ -79,6 +82,7 @@ final class Financial
      * annually. The internal rate of return is the interest rate
      * received for an investment consisting of payments (negative
      * values) and income (positive values) that occur at regular periods.
+     * https://support.office.com/pl-pl/article/IRR-funkcja-64925eaa-9988-495b-b290-3ad0c163c1bc
      *
      * @param SingleCurrencyPaymentList $paymentList
      * @param float $guess
@@ -87,7 +91,7 @@ final class Financial
      *
      * @internal param $values
      */
-    public function IRR(SingleCurrencyPaymentList $paymentList, $guess = 0.1)
+    public function IRR(SingleCurrencyPaymentList $paymentList, float $guess = 0.1)
     {
         $x1 = 0.0;
         $x2 = $guess;
@@ -213,10 +217,146 @@ final class Financial
         return (is_finite($sln) ? new Money(round($sln), $cost->getCurrency()) : null);
     }
 
+    /**
+     * VDB
+     * Returns the depreciation of an asset for any period you specify,
+     * including partial periods, using the double-declining balance method
+     * or some other method you specify. VDB stands for variable declining balance.
+     * https://support.office.com/pl-pl/article/VDB-funkcja-dde4e207-f3fa-488d-91d2-66d55e861d73
+     *
+     * @param  Money   $cost         is the initial cost of the asset.
+     * @param  Money   $salvage      is the value at the end of the depreciation (sometimes called the salvage value of the asset).
+     * @param  integer $life         is the number of periods over which the asset is depreciated (sometimes called the useful life of the asset).
+     * @param  integer $start_period is the starting period for which you want to calculate the depreciation. Start_period must use the same units as life.
+     * @param  integer $end_period   is the ending period for which you want to calculate the depreciation. End_period must use the same units as life.
+     * @param  float   $factor       is the rate at which the balance declines. If factor is omitted, it is assumed to be 2 (the double-declining balance method). Change factor if you do not want to use the double-declining balance method.
+     * @param  bool    $no_switch    is a logical value specifying whether to switch to straight-line depreciation when depreciation is greater than the declining balance calculation.
+     * @return Money   the depreciation of an asset.
+     */
+    public function VDB(Money $cost, Money $salvage, int $life, int $start_period, int $end_period, float $factor = 2.0, bool $no_switch = false)
+    {
+        // pre-validations
+        if ($start_period < 0
+            || $factor <= 0
+            || $end_period < $start_period
+            || $end_period > $life
+            || $cost->getAmount() < 0
+            || $salvage->getAmount() > $cost->getAmount())
+        {
+            return null;
+        }
+
+        $fVdb = 0.0;
+        $fIntStart = floor($start_period);
+        $fIntEnd = ceil($end_period);
+
+        if ($no_switch) {
+            $nLoopStart = (int) $fIntStart;
+            $nLoopEnd = (int) $fIntEnd;
+
+            for ($i = $nLoopStart + 1; $i <= $nLoopEnd; $i++) {
+                $fTerm = $this->_ScGetGDA((float) $cost->getAmount(), (float) $salvage->getAmount(), $life, $i, $factor);
+                if ($i === $nLoopStart + 1) {
+                    $fTerm *= (min($end_period, $fIntStart + 1.0) - $start_period);
+                }
+                elseif ($i === $nLoopEnd) {
+                    $fTerm *= ($end_period + 1.0 - $fIntEnd);
+                }
+                $fVdb += $fTerm;
+            }
+        } else {
+            $life1 = $life;
+
+            if ($start_period !== $fIntStart) {
+                if ($factor > 1) {
+                    if ($start_period >= ($life / 2)) {
+                        $fPart = $start_period - ($life / 2);
+                        $start_period = $life / 2;
+                        $end_period -= $fPart;
+                        ++$life1;
+                    }
+                }
+            }
+
+            $cost->subtract($this->_ScInterVDB($cost, $salvage, $life, $life1, $start_period, $factor));
+            $fVdb = $this->_ScInterVDB($cost, $salvage, $life, $life - $start_period, $end_period - $start_period, $factor);
+        }
+
+        return $fVdb;
+    }
+
     private function verifyCurrencyEquality(Money $var1, Money $var2)
     {
-        if ($var1->getCurrency()->getCode() !== $var2->getCurrency()->getCode()) {
-            throw new \InvalidArgumentException('');
+        Assertion::eq($var1->getCurrency(), $var2->getCurrency());
+    }
+
+    private function _ScGetGDA(float $fWert, float $fRest, float $fDauer, float $fPeriode, float $fFaktor): float
+    {
+        $fZins = $fFaktor / $fDauer;
+        if ($fZins >= 1.0) {
+            $fZins = 1.0;
+            $fAlterWert = 0.0;
+            if ($fPeriode === 1.0) {
+                $fAlterWert = $fWert;
+            }
+        } else {
+            $fAlterWert = $fWert * ((1.0 - $fZins) ** ($fPeriode - 1.0));
         }
+
+        $fNeuerWert = $fWert * ((1.0 - $fZins) ** $fPeriode);
+
+        if ($fNeuerWert < $fRest) {
+            $fGda = $fAlterWert - $fRest;
+        }
+        else {
+            $fGda = $fAlterWert - $fNeuerWert;
+        }
+
+        if ($fGda < 0.0) {
+            $fGda = 0.0;
+        }
+
+        return $fGda;
+    }
+
+    private function _ScInterVDB(Money $cost, Money $salvage, float $life, float $life1, float $period, float $factor): Money
+    {
+        $this->verifyCurrencyEquality($cost, $salvage);
+
+        $fVdb       = 0;
+        $fIntEnd    = ceil($period);
+        $nLoopEnd   = $fIntEnd;
+        $fRestwert  = $cost->getAmount() - $salvage->getAmount();
+        $bNowLia    = false;
+
+        $fLia = 0;
+        for ($i = 1; $i <= $nLoopEnd; $i++) {
+            if (!$bNowLia) {
+                $fGda = $this->_ScGetGDA(
+                    (float) $cost->getAmount(),
+                    (float) $salvage->getAmount(),
+                    $life,
+                    $i,
+                    $factor
+                );
+                $fLia = $fRestwert / ($life1 - (float)($i - 1));
+
+                if ($fLia > $fGda) {
+                    $fTerm   = $fLia;
+                    $bNowLia = true;
+                } else {
+                    $fTerm      = $fGda;
+                    $fRestwert -= $fGda;
+                }
+            } else {
+                $fTerm = $fLia;
+            }
+
+            if ($i === $nLoopEnd) {
+                $fTerm *= ($period + 1.0 - $fIntEnd);
+            }
+            $fVdb += $fTerm;
+        }
+        return new Money(round($fVdb), $cost->getCurrency());
     }
 }
