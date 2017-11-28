@@ -165,7 +165,7 @@ final class Financial
      * @param integer $period is the period for which you want to calculate the depreciation. Period must use the same units as life.
      * @param float $factor is the rate at which the balance declines. If factor is omitted, it is assumed to be 2 (the double-declining balance method).
      *
-     * @return Money
+     * @return Money|null
      * @throws \InvalidArgumentException
      */
     public function DDB(Money $cost, Money $salvage, int $life, int $period, $factor = 2.0)
@@ -189,5 +189,28 @@ final class Financial
             $n++;
         }
         return \is_finite($x) ? new Money(round($x), $cost->getCurrency()) : null;
+    }
+
+    /**
+     * SLN
+     * Returns the straight-line depreciation of an asset for one period.
+     * https://support.office.com/pl-pl/article/SLN-funkcja-cdb666e5-c1c6-40a7-806a-e695edc2f1c8
+     *
+     * @param  Money $cost is the initial cost of the asset.
+     * @param  Money $salvage is the value at the end of the depreciation (sometimes called the salvage value of the asset).
+     * @param  integer $life is the number of periods over which the asset is being depreciated (sometimes called the useful life of the asset).
+     *
+     * @return Money|null
+     * @throws \InvalidArgumentException
+     */
+    public function SLN(Money $cost, Money $salvage, int $life)
+    {
+        if ($cost->getCurrency()->getCode() !== $salvage->getCurrency()->getCode()) {
+            throw new \InvalidArgumentException('');
+        }
+
+        $sln = ($cost->getAmount() - $salvage->getAmount()) / $life;
+
+        return (is_finite($sln) ? new Money(round($sln), $cost->getCurrency()) : null);
     }
 }

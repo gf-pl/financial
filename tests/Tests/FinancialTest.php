@@ -82,4 +82,10 @@ final class FinancialTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->assertEquals(Money::EUR(22.12 * 100), $financial->DDB(Money::PLN(2400 * 100), Money::EUR(300 * 100), 10, 10));
     }
+
+    public function test_sln()
+    {
+        $financial = new Financial();
+        $this->assertEquals(Money::EUR(2250 * 100), $financial->SLN(Money::EUR(30000 * 100), Money::EUR(7500 * 100), 10));
+    }
 }
