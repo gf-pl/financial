@@ -144,9 +144,8 @@ final class Financial
      */
     public function SYD(Money $cost, Money $salvage, int $life, int $period)
     {
-        if ($cost->getCurrency()->getCode() !== $salvage->getCurrency()->getCode()) {
-            throw new \InvalidArgumentException('');
-        }
+        $this->verifyCurrencyEquality($cost, $salvage);
+
         $sydValue = (($cost->getAmount() - $salvage->getAmount()) * ($life - $period + 1) * 2) / ($life * (1 + $life));
         $sydValue = \round($sydValue);
 
@@ -170,9 +169,7 @@ final class Financial
      */
     public function DDB(Money $cost, Money $salvage, int $life, int $period, $factor = 2.0)
     {
-        if ($cost->getCurrency()->getCode() !== $salvage->getCurrency()->getCode()) {
-            throw new \InvalidArgumentException('');
-        }
+        $this->verifyCurrencyEquality($cost, $salvage);
 
         $x = 0;
         $n = 0;
@@ -205,12 +202,17 @@ final class Financial
      */
     public function SLN(Money $cost, Money $salvage, int $life)
     {
-        if ($cost->getCurrency()->getCode() !== $salvage->getCurrency()->getCode()) {
-            throw new \InvalidArgumentException('');
-        }
+        $this->verifyCurrencyEquality($cost, $salvage);
 
         $sln = ($cost->getAmount() - $salvage->getAmount()) / $life;
 
         return (is_finite($sln) ? new Money(round($sln), $cost->getCurrency()) : null);
+    }
+
+    private function verifyCurrencyEquality(Money $var1, Money $var2)
+    {
+        if ($var1->getCurrency()->getCode() !== $var2->getCurrency()->getCode()) {
+            throw new \InvalidArgumentException('');
+        }
     }
 }
