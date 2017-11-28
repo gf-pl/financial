@@ -66,6 +66,8 @@ final class Financial
                 return $x_mid;
             }
         }
+
+        return null;
     }
 
     /**
